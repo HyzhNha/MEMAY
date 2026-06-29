@@ -1,0 +1,383 @@
+local p = game.Players.LocalPlayer
+local u = game:GetService("UserInputService")
+local rs = game:GetService("RunService")
+
+-- 1. KHỞI TẠO SCREEN GUI
+local sg = Instance.new("ScreenGui", p:WaitForChild("PlayerGui"))
+sg.Name = "TanzDepZAI_CustomLayout_V18"
+sg.ResetOnSpawn = false
+
+-- Khung nền chính
+local mainFrame = Instance.new("Frame", sg)
+mainFrame.Size = UDim2.new(0, 700, 0, 360)
+mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(236, 233, 216)
+mainFrame.Active = true
+
+-- VIỀN RAINBOW CHẠY LIÊN TỤC
+local mainStroke = Instance.new("UIStroke", mainFrame)
+mainStroke.Thickness = 4
+
+----------------------------------------------------------------
+-- 2. THANH TIÊU ĐỀ (TOP BAR) - ĐÃ THÊM TÊN THƯƠNG HIỆU THEO Ý MÀY
+----------------------------------------------------------------
+local topBarLeft = Instance.new("Frame", mainFrame)
+topBarLeft.Size = UDim2.new(0, 500, 0, 35)
+topBarLeft.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+
+-- Thêm Text hiển thị tên thương hiệu "TanzDepZAI làm từ Gemini :)"
+local titleTxt = Instance.new("TextLabel", topBarLeft)
+titleTxt.Size = UDim2.new(1, -20, 1, 0)
+titleTxt.Position = UDim2.new(0, 15, 0, 0)
+titleTxt.BackgroundTransparency = 1
+titleTxt.Text = "TanzDepZAI làm từ Gemini :)"
+titleTxt.Font = Enum.Font.SourceSansBold
+titleTxt.TextColor3 = Color3.fromRGB(0, 0, 0)
+titleTxt.TextSize = 16
+titleTxt.TextXAlignment = Enum.TextXAlignment.Left
+
+local topBarRight = Instance.new("Frame", mainFrame)
+topBarRight.Size = UDim2.new(0, 200, 0, 35)
+topBarRight.Position = UDim2.new(0, 500, 0, 0)
+topBarRight.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+
+-- Nút X đóng giao diện
+local btnClose = Instance.new("TextButton", topBarRight)
+btnClose.Size = UDim2.new(0, 50, 1, 0)
+btnClose.Position = UDim2.new(1, -50, 0, 0)
+btnClose.BackgroundColor3 = Color3.fromRGB(230, 40, 40)
+btnClose.Text = "X"
+btnClose.Font = Enum.Font.SourceSansBold
+btnClose.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnClose.TextSize = 16
+local closeStroke = Instance.new("UIStroke", btnClose)
+closeStroke.Color = Color3.fromRGB(0, 0, 0)
+
+----------------------------------------------------------------
+-- 3. CỘT BÊN TRÁI (MÀU XANH DƯƠNG CHỨA CÁC CHỨC NĂNG & ESP)
+----------------------------------------------------------------
+local leftPanel = Instance.new("Frame", mainFrame)
+leftPanel.Size = UDim2.new(0, 240, 0, 325)
+leftPanel.Position = UDim2.new(0, 0, 0, 35)
+leftPanel.BackgroundColor3 = Color3.fromRGB(0, 162, 232)
+
+local walkSpeedValue = 16
+local jumpPowerValue = 50
+local infJumpEnabled = false
+local espEnabled = false
+
+local function createFeatureRow(labelTxt, yPos)
+    local lbl = Instance.new("TextLabel", leftPanel)
+    lbl.Size = UDim2.new(0, 90, 0, 40)
+    lbl.Position = UDim2.new(0, 10, 0, yPos)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = labelTxt
+    lbl.Font = Enum.Font.SourceSansBold
+    lbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lbl.TextSize = 16
+
+    local box = Instance.new("TextBox", leftPanel)
+    box.Size = UDim2.new(0, 45, 0, 30)
+    box.Position = UDim2.new(0, 75, 0, yPos + 5)
+    box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    box.Text = ""
+    box.PlaceholderText = "Số"
+    box.Font = Enum.Font.SourceSansBold
+    box.TextSize = 14
+
+    local btn = Instance.new("TextButton", leftPanel)
+    btn.Size = UDim2.new(0, 95, 0, 40)
+    btn.Position = UDim2.new(0, 130, 0, yPos)
+    btn.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+    btn.Text = "Click"
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 14
+    
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 12)
+    local bStroke = Instance.new("UIStroke", btn)
+    bStroke.Color = Color3.fromRGB(0, 0, 0)
+    bStroke.Thickness = 3
+
+    return box, btn
+end
+
+local boxSpeed, btnSpeed = createFeatureRow("SPEED", 20)
+local boxJump, btnJump = createFeatureRow("JUMP", 80)
+
+-- HÀNG INFINITY JUMP
+local lblInf = Instance.new("TextLabel", leftPanel)
+lblInf.Size = UDim2.new(0, 110, 0, 40)
+lblInf.Position = UDim2.new(0, 10, 0, 140)
+lblInf.BackgroundTransparency = 1
+lblInf.Text = "infinity jump"
+lblInf.Font = Enum.Font.SourceSansBold
+lblInf.TextColor3 = Color3.fromRGB(255, 255, 255)
+lblInf.TextSize = 16
+
+local btnInfJump = Instance.new("TextButton", leftPanel)
+btnInfJump.Size = UDim2.new(0, 95, 0, 40)
+btnInfJump.Position = UDim2.new(0, 130, 0, 140)
+btnInfJump.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+btnInfJump.Text = "Click"
+btnInfJump.Font = Enum.Font.SourceSansBold
+btnInfJump.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnInfJump.TextSize = 14
+Instance.new("UICorner", btnInfJump).CornerRadius = UDim.new(0, 12)
+local infStroke = Instance.new("UIStroke", btnInfJump)
+infStroke.Color = Color3.fromRGB(0, 0, 0)
+infStroke.Thickness = 3
+
+-- HÀNG ESP NAME
+local lblEsp = Instance.new("TextLabel", leftPanel)
+lblEsp.Size = UDim2.new(0, 110, 0, 40)
+lblEsp.Position = UDim2.new(0, 10, 0, 200)
+lblEsp.BackgroundTransparency = 1
+lblEsp.Text = "ESP Name"
+lblEsp.Font = Enum.Font.SourceSansBold
+lblEsp.TextColor3 = Color3.fromRGB(255, 255, 255)
+lblEsp.TextSize = 16
+
+local btnEsp = Instance.new("TextButton", leftPanel)
+btnEsp.Size = UDim2.new(0, 95, 0, 40)
+btnEsp.Position = UDim2.new(0, 130, 0, 200)
+btnEsp.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+btnEsp.Text = "Click"
+btnEsp.Font = Enum.Font.SourceSansBold
+btnEsp.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnEsp.TextSize = 14
+Instance.new("UICorner", btnEsp).CornerRadius = UDim.new(0, 12)
+local espStroke = Instance.new("UIStroke", btnEsp)
+espStroke.Color = Color3.fromRGB(0, 0, 0)
+espStroke.Thickness = 3
+
+----------------------------------------------------------------
+-- 4. KHU VỰC BÊN PHẢI (6 HÀNG SCRIPT MÀU VÀNG & NÚT XANH LÁ)
+----------------------------------------------------------------
+local rightPanel = Instance.new("Frame", mainFrame)
+rightPanel.Size = UDim2.new(0, 460, 0, 325)
+rightPanel.Position = UDim2.new(0, 240, 0, 35)
+rightPanel.BackgroundTransparency = 1
+
+local function createScriptRow(scriptName, yPos, loadstringUrl)
+    local nameLabel = Instance.new("TextLabel", rightPanel)
+    nameLabel.Size = UDim2.new(0, 310, 0, 48)
+    nameLabel.Position = UDim2.new(0, 0, 0, yPos)
+    nameLabel.BackgroundColor3 = Color3.fromRGB(255, 242, 0)
+    nameLabel.Text = scriptName
+    nameLabel.Font = Enum.Font.SourceSansBold
+    nameLabel.TextColor3 = Color3.fromRGB(163, 73, 164)
+    nameLabel.TextSize = 15
+    Instance.new("UIStroke", nameLabel).Color = Color3.fromRGB(0, 0, 0)
+
+    local actButton = Instance.new("TextButton", rightPanel)
+    actButton.Size = UDim2.new(0, 150, 0, 48)
+    actButton.Position = UDim2.new(0, 310, 0, yPos)
+    actButton.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+    actButton.Text = "Click"
+    actButton.Font = Enum.Font.SourceSansBold
+    actButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    actButton.TextSize = 15
+    Instance.new("UIStroke", actButton).Color = Color3.fromRGB(0, 0, 0)
+
+    actButton.MouseButton1Click:Connect(function()
+        if loadstringUrl and loadstringUrl ~= "" then
+            loadstring(game:HttpGet(loadstringUrl))()
+        end
+    end)
+end
+
+createScriptRow("Real kid", 0, "https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua")
+createScriptRow("w-azure", 52, "https://pastefy.app/PA30h9vO/raw")
+createScriptRow("script fly", 104, "https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt")
+createScriptRow("script invisible man", 156, "https://rawscripts.net/raw/Universal-Script-Awesome-Invisible-man-21074")
+createScriptRow("script hitbox", 208, "https://pastefy.app/ItfO0tdg/raw")
+createScriptRow("infinite yield", 260, "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
+
+----------------------------------------------------------------
+-- 5. CƠ CHẾ KÉO CẠNH CO GIÃN ĐỘC LẬP CHUẨN WINDOWS
+----------------------------------------------------------------
+local resizeRight = Instance.new("TextButton", mainFrame)
+resizeRight.Size = UDim2.new(0, 15, 1, 0)
+resizeRight.Position = UDim2.new(1, -10, 0, 0)
+resizeRight.BackgroundTransparency = 1
+resizeRight.Text = ""
+
+local resizeBottom = Instance.new("TextButton", mainFrame)
+resizeBottom.Size = UDim2.new(1, 0, 0, 15)
+resizeBottom.Position = UDim2.new(0, 0, 1, -10)
+resizeBottom.BackgroundTransparency = 1
+resizeBottom.Text = ""
+
+local isDragging, isResizing = false, false
+local dragStart, startPos, mouseStart, sizeStart
+
+topBarLeft.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = true
+        dragStart = input.Position
+        startPos = mainFrame.Position
+    end
+end)
+
+local function setResizeActive(hitbox)
+    hitbox.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            isResizing = true
+            mouseStart = u:GetMouseLocation()
+            sizeStart = mainFrame.Size
+        end
+    end)
+end
+setResizeActive(resizeRight)
+setResizeActive(resizeBottom)
+
+u.InputChanged:Connect(function(input)
+    if isDragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        mainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    elseif isResizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local mouseNow = u:GetMouseLocation()
+        local delta = mouseNow - mouseStart
+        
+        local newW = math.clamp(sizeStart.X.Offset + delta.X, 500, 1200)
+        local newH = math.clamp(sizeStart.Y.Offset + delta.Y, 320, 800)
+        
+        mainFrame.Size = UDim2.new(0, newW, 0, newH)
+        
+        topBarLeft.Size = UDim2.new(0, newW - 200, 0, 35)
+        topBarRight.Position = UDim2.new(0, newW - 200, 0, 0)
+        leftPanel.Size = UDim2.new(0, 240, 0, newH - 35)
+        rightPanel.Size = UDim2.new(0, newW - 240, 0, newH - 35)
+    end
+end)
+
+u.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        isDragging = false
+        isResizing = false
+    end
+end)
+
+----------------------------------------------------------------
+-- 6. HỆ THỐNG ESP NAME
+----------------------------------------------------------------
+local function applyEsp(v)
+    if v ~= p then
+        local function makeTag()
+            local char = v.Character or v.CharacterAdded:Wait()
+            local head = char:WaitForChild("Head", 5)
+            if head and not head:FindFirstChild("TanzEspTag") then
+                local bb = Instance.new("BillboardGui")
+                bb.Name = "TanzEspTag"
+                bb.Adornee = head
+                bb.Size = UDim2.new(0, 100, 0, 30)
+                bb.StudsOffset = Vector3.new(0, 2, 0)
+                bb.AlwaysOnTop = true
+                bb.Parent = head
+
+                local txt = Instance.new("TextLabel", bb)
+                txt.Size = UDim2.new(1, 0, 1, 0)
+                txt.BackgroundTransparency = 1
+                txt.Text = v.Name
+                txt.Font = Enum.Font.SourceSansBold
+                txt.TextColor3 = Color3.fromRGB(255, 255, 255)
+                txt.TextSize = 14
+                local stroke = Instance.new("UIStroke", txt)
+                stroke.Color = Color3.fromRGB(0, 0, 0)
+            end
+        end
+        if v.Character then makeTag() end
+        v.CharacterAdded:Connect(makeTag)
+    end
+end
+
+local function removeEsp()
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        if player.Character and player.Character:FindFirstChild("Head") then
+            local tag = player.Character.Head:FindFirstChild("TanzEspTag")
+            if tag then tag:Destroy() end
+        end
+    end
+end
+
+btnEsp.MouseButton1Click:Connect(function()
+    espEnabled = not espEnabled
+    if espEnabled then
+        btnEsp.Text = "ON"
+        btnEsp.BackgroundColor3 = Color3.fromRGB(230, 40, 40)
+        for _, pl in ipairs(game.Players:GetPlayers()) do applyEsp(pl) end
+        game.Players.PlayerAdded:Connect(applyEsp)
+    else
+        btnEsp.Text = "Click"
+        btnEsp.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+        removeEsp()
+    end
+end)
+
+rs.RenderStepped:Connect(function()
+    if espEnabled then
+        for _, pl in ipairs(game.Players:GetPlayers()) do
+            if pl ~= p and pl.Character and pl.Character:FindFirstChild("Head") then
+                if not pl.Character.Head:FindFirstChild("TanzEspTag") then
+                    applyEsp(pl)
+                end
+            end
+        end
+    end
+end)
+
+----------------------------------------------------------------
+-- 7. VÒNG LẶP HACK CHỈ SỐ VẬT LÝ & VIỀN RAINBOW
+----------------------------------------------------------------
+btnClose.MouseButton1Click:Connect(function() 
+    removeEsp()
+    sg:Destroy() 
+end)
+
+u.InputBegan:Connect(function(i, pcd)
+    if not pcd and i.KeyCode == Enum.KeyCode.LeftControl then
+        mainFrame.Visible = not mainFrame.Visible
+    end
+end)
+
+btnSpeed.MouseButton1Click:Connect(function()
+    local num = tonumber(boxSpeed.Text)
+    if num then walkSpeedValue = num else walkSpeedValue = 16 end
+end)
+
+btnJump.MouseButton1Click:Connect(function()
+    local num = tonumber(boxJump.Text)
+    if num then jumpPowerValue = num else jumpPowerValue = 50 end
+end)
+
+btnInfJump.MouseButton1Click:Connect(function()
+    infJumpEnabled = not infJumpEnabled
+    if infJumpEnabled then
+        btnInfJump.Text = "ON"
+        btnInfJump.BackgroundColor3 = Color3.fromRGB(230, 40, 40)
+    else
+        btnInfJump.Text = "Click"
+        btnInfJump.BackgroundColor3 = Color3.fromRGB(34, 177, 76)
+    end
+end)
+
+u.JumpRequest:Connect(function()
+    if infJumpEnabled then
+        local char = p.Character
+        local root = char and char:FindFirstChild("HumanoidRootPart")
+        if root then
+            root.Velocity = Vector3.new(root.Velocity.X, jumpPowerValue, root.Velocity.Z)
+        end
+    end
+end)
+
+rs.RenderStepped:Connect(function()
+    local char = p.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum and hum.Health > 0 then
+        hum.WalkSpeed = walkSpeedValue
+        hum.JumpPower = jumpPowerValue
+    end
+    mainStroke.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+end)
