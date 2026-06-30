@@ -4,7 +4,7 @@ local rs = game:GetService("RunService")
 
 -- 1. KHỞI TẠO SCREEN GUI TỔNG
 local sg = Instance.new("ScreenGui", p:WaitForChild("PlayerGui"))
-sg.Name = "TanzDepZAI_Final_Version"
+sg.Name = "TanzDepZAI_Final_Fixed_V4_Swapped"
 sg.ResetOnSpawn = false
 
 ----------------------------------------------------------------
@@ -51,7 +51,7 @@ barFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
 ----------------------------------------------------------------
 local mainFrame = Instance.new("Frame", sg)
 mainFrame.Size = UDim2.new(0, 700, 0, 360)
-mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
+mainFrame.Position = UDim2.new(0.5, -350, 0.5, -180)
 mainFrame.BackgroundColor3 = Color3.fromRGB(236, 233, 216)
 mainFrame.Active = true
 mainFrame.Visible = false 
@@ -91,48 +91,48 @@ btnClose.TextSize = 16
 local closeStroke = Instance.new("UIStroke", btnClose)
 closeStroke.Color = Color3.fromRGB(0, 0, 0)
 
--- [MỚI] Nút thu nhỏ [-] kế bên nút X (Theo hình ok.png)
-local btnMinimize = Instance.new("TextButton", topBarRight)
-btnMinimize.Size = UDim2.new(0, 50, 1, 0)
-btnMinimize.Position = UDim2.new(1, -102, 0, 0) -- Xếp bên trái nút X
-btnMinimize.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
-btnMinimize.Text = "-"
-btnMinimize.Font = Enum.Font.SourceSansBold
-btnMinimize.TextColor3 = Color3.fromRGB(255, 255, 255)
-btnMinimize.TextSize = 20
-local miniStroke = Instance.new("UIStroke", btnMinimize)
+-- Nút hình vuông ⬜ -> CHỈNH LẠI: Thu nhỏ ẩn sạch bảng, hiện nút tròn Tanz
+local btnSquareMinimize = Instance.new("TextButton", topBarRight)
+btnSquareMinimize.Size = UDim2.new(0, 50, 1, 0)
+btnSquareMinimize.Position = UDim2.new(1, -102, 0, 0)
+btnSquareMinimize.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+btnSquareMinimize.Text = "⬜"
+btnSquareMinimize.Font = Enum.Font.SourceSansBold
+btnSquareMinimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnSquareMinimize.TextSize = 12
+local sqStroke = Instance.new("UIStroke", btnSquareMinimize)
+sqStroke.Color = Color3.fromRGB(0, 0, 0)
+
+-- Nút dấu trừ — -> CHỈNH LẠI: Thu nhỏ 1 nửa bảng (chỉ ẩn panel script bên phải)
+local btnMinimizeHalf = Instance.new("TextButton", topBarRight)
+btnMinimizeHalf.Size = UDim2.new(0, 50, 1, 0)
+btnMinimizeHalf.Position = UDim2.new(1, -154, 0, 0)
+btnMinimizeHalf.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+btnMinimizeHalf.Text = "—"
+btnMinimizeHalf.Font = Enum.Font.SourceSansBold
+btnMinimizeHalf.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnMinimizeHalf.TextSize = 16
+local miniStroke = Instance.new("UIStroke", btnMinimizeHalf)
 miniStroke.Color = Color3.fromRGB(0, 0, 0)
 
 ----------------------------------------------------------------
--- [MỚI] TẠO NÚT TRÒN THU NHỎ Ở GÓC PHẢI (GẦN NÚT JUMP - THEO OK.PNG)
+-- TẠO NÚT TRÒN Ở GÓC JUMP (KHI BẤM NÚT HÌNH VUÔNG ⬜)
 ----------------------------------------------------------------
 local quickOpenBtn = Instance.new("TextButton", sg)
 quickOpenBtn.Size = UDim2.new(0, 55, 0, 55)
-quickOpenBtn.Position = UDim2.new(0.85, 0, 0.70, 0) -- Đặt gần nút Jump di động, không bị sát quá
+quickOpenBtn.Position = UDim2.new(0.85, 0, 0.70, 0) 
 quickOpenBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 232)
 quickOpenBtn.Text = "Tanz"
 quickOpenBtn.Font = Enum.Font.SourceSansBold
 quickOpenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
 quickOpenBtn.TextSize = 16
-quickOpenBtn.Visible = false -- Ban đầu ẩn đi
+quickOpenBtn.Visible = false
 
 local btnCorner = Instance.new("UICorner", quickOpenBtn)
-btnCorner.CornerRadius = UDim.new(1, 0) -- Biến thành hình tròn xịn sò giống ok.png
-
+btnCorner.CornerRadius = UDim.new(1, 0)
 local btnStroke = Instance.new("UIStroke", quickOpenBtn)
 btnStroke.Thickness = 3
 btnStroke.Color = Color3.fromRGB(255, 255, 255)
-
--- Logic ẩn/hiển thị khi bấm nút Thu Nhỏ
-btnMinimize.MouseButton1Click:Connect(function()
-    mainFrame.Visible = false
-    quickOpenBtn.Visible = true
-end)
-
-quickOpenBtn.MouseButton1Click:Connect(function()
-    mainFrame.Visible = true
-    quickOpenBtn.Visible = false
-end)
 
 ----------------------------------------------------------------
 -- [PHẦN 3] CỘT TRÁI (SPEED / JUMP / INF JUMP / ESP)
@@ -147,7 +147,7 @@ local jumpPowerValue = 50
 local infJumpEnabled = false
 local espEnabled = false
 
-local function createFeatureRow(labelTxt, yPos)
+local function createFeatureRow(labelTxt, yPos, defaultNum)
     local lbl = Instance.new("TextLabel", leftPanel)
     lbl.Size = UDim2.new(0, 90, 0, 40)
     lbl.Position = UDim2.new(0, 10, 0, yPos)
@@ -161,8 +161,7 @@ local function createFeatureRow(labelTxt, yPos)
     box.Size = UDim2.new(0, 45, 0, 30)
     box.Position = UDim2.new(0, 75, 0, yPos + 5)
     box.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    box.Text = ""
-    box.PlaceholderText = "Số"
+    box.Text = tostring(defaultNum)
     box.Font = Enum.Font.SourceSansBold
     box.TextSize = 14
 
@@ -183,8 +182,8 @@ local function createFeatureRow(labelTxt, yPos)
     return box, btn
 end
 
-local boxSpeed, btnSpeed = createFeatureRow("SPEED", 20)
-local boxJump, btnJump = createFeatureRow("JUMP", 80)
+local boxSpeed, btnSpeed = createFeatureRow("SPEED", 20, 16)
+local boxJump, btnJump = createFeatureRow("JUMP", 80, 50)
 
 local lblInf = Instance.new("TextLabel", leftPanel)
 lblInf.Size = UDim2.new(0, 110, 0, 40)
@@ -229,7 +228,7 @@ local espStroke = Instance.new("UIStroke", btnEsp)
 espStroke.Color = Color3.fromRGB(0, 0, 0)
 
 ----------------------------------------------------------------
--- [PHẦN 4] KHU VỰC BÊN PHẢI (6 HÀNG SCRIPT)
+-- [PHẦN 4] KHU VỰC BÊN PHẢI (TRA ĐÚNG CÁI LINK PASTEFY CỦA MÀY)
 ----------------------------------------------------------------
 local rightPanel = Instance.new("Frame", mainFrame)
 rightPanel.Size = UDim2.new(0, 460, 0, 325)
@@ -259,20 +258,62 @@ local function createScriptRow(scriptName, yPos, loadstringUrl)
 
     actButton.MouseButton1Click:Connect(function()
         if loadstringUrl and loadstringUrl ~= "" then
-            loadstring(game:HttpGet(loadstringUrl))()
+            local success, err = pcall(function()
+                loadstring(game:HttpGet(loadstringUrl))()
+            end)
+            if not success then
+                warn("Lỗi tải Script: " .. tostring(err))
+            end
         end
     end)
 end
 
 createScriptRow("Real kid", 0, "https://raw.githubusercontent.com/realkidhub/realkid/refs/heads/main/main.lua")
-createScriptRow("w-azure", 52, "https://pastefy.app/PA30h9vO/raw")
+createScriptRow("w-azure", 52, "https://pastefy.app/PA30h9vO/raw") 
 createScriptRow("script fly", 104, "https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt")
 createScriptRow("script invisible man", 156, "https://rawscripts.net/raw/Universal-Script-Awesome-Invisible-man-21074")
 createScriptRow("script hitbox", 208, "https://pastefy.app/ItfO0tdg/raw")
 createScriptRow("infinite yield", 260, "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
 
 ----------------------------------------------------------------
--- [PHẦN 5] CƠ CHẾ RE-SIZE MENU
+-- LOGIC PHÓNG TO / THU NHỎ ĐÃ ĐỔI NGƯỢC NHAU CHUẨN Ý MÀY
+----------------------------------------------------------------
+-- 1. Nút hình vuông ⬜ thu nhỏ ẩn hẳn bảng chính, hiện nút tròn Tanz ở góc Jump
+btnSquareMinimize.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    quickOpenBtn.Visible = true
+end)
+
+quickOpenBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    quickOpenBtn.Visible = false
+end)
+
+-- 2. Nút dấu gạch ngang — thu nhỏ 1 nửa bảng (chỉ ẩn panel script bên phải)
+local halfMinimized = false
+btnMinimizeHalf.MouseButton1Click:Connect(function()
+    halfMinimized = not halfMinimized
+    if halfMinimized then
+        rightPanel.Visible = false
+        mainFrame.Size = UDim2.new(0, 240, 0, 360)
+        topBarLeft.Size = UDim2.new(0, 140, 0, 35)
+        topBarRight.Position = UDim2.new(0, 140, 0, 0)
+    else
+        rightPanel.Visible = true
+        mainFrame.Size = UDim2.new(0, 700, 0, 360)
+        topBarLeft.Size = UDim2.new(0, 500, 0, 35)
+        topBarRight.Position = UDim2.new(0, 500, 0, 0)
+    end
+end)
+
+-- Nút X tắt luôn bảng xóa hoàn toàn GUI
+btnClose.MouseButton1Click:Connect(function() 
+    removeEsp()
+    sg:Destroy() 
+end)
+
+----------------------------------------------------------------
+-- [PHẦN 5] CƠ CHẾ RE-SIZE MENU GIỮ NGUYÊN
 ----------------------------------------------------------------
 local resizeRight = Instance.new("TextButton", mainFrame)
 resizeRight.Size = UDim2.new(0, 15, 1, 0)
@@ -343,14 +384,14 @@ task.spawn(function()
     for i = 0, 100 do
         percentLabel.Text = tostring(i) .. "%"
         barFill.Size = UDim2.new(i / 100, 0, 1, 0)
-        task.wait(0.02)
+        task.wait(0.01)
     end
     loadingFrame:Destroy()
     mainFrame.Visible = true
 end)
 
 ----------------------------------------------------------------
--- [PHẦN 7] HỆ THỐNG ESP NAME
+-- [PHẦN 7] HỆ THỐNG ESP NAME CHUẨN
 ----------------------------------------------------------------
 local function applyEsp(v)
     if v ~= p then
@@ -405,68 +446,32 @@ btnEsp.MouseButton1Click:Connect(function()
     end
 end)
 
-rs.RenderStepped:Connect(function()
-    if espEnabled then
-        for _, pl in ipairs(game.Players:GetPlayers()) do
-            if pl ~= p and pl.Character and pl.Character:FindFirstChild("Head") then
-                if not pl.Character.Head:FindFirstChild("TanzEspTag") then
-                    applyEsp(pl)
-                end
-            end
-        end
-    end
-end)
-
 ----------------------------------------------------------------
--- [PHẦN 8] VÒNG LẶP CHỈ SỐ VẬT LÝ & RAINBOW BORDER
+-- [PHẦN 8 BẢN CUỐI] FIX SPEED / JUMP KHÔNG GIỚI HẠN & HOOK CHỐNG GAME RESET
 ----------------------------------------------------------------
-btnClose.MouseButton1Click:Connect(function() 
-    removeEsp()
-    sg:Destroy() 
-end)
-
--- [MỚI CẬP NHẬT] Thêm phím [V] để mở khóa chuột khi nhìn góc nhìn thứ nhất (Theo hình ok.png)
 local mouseUnlocked = false
-u.InputBegan:Connect(function(i, pcd)
-    if not pcd then
-        -- Nhấn nút Control Trái để ẩn/hiện bảng nhanh
-        if i.KeyCode == Enum.KeyCode.LeftControl then
-            if mainFrame.Visible or quickOpenBtn.Visible then
-                if mainFrame.Visible then
-                    mainFrame.Visible = false
-                    quickOpenBtn.Visible = true
-                else
-                    mainFrame.Visible = true
-                    quickOpenBtn.Visible = false
-                end
-            end
-        -- Nhấn nút [V] để khóa/mở khóa di chuyển chuột tự do ở góc nhìn thứ nhất
-        elseif i.KeyCode == Enum.KeyCode.V then
-            mouseUnlocked = not mouseUnlocked
-            if mouseUnlocked then
-                u.MouseBehavior = Enum.MouseBehavior.Default -- Mở khóa chuột tự do
-            else
-                u.MouseBehavior = Enum.MouseBehavior.LockCenter -- Khóa tâm lại theo game
-            end
-        end
-    end
-end)
 
--- Giữ chuột luôn mở khóa nếu chế độ mouseUnlocked được bật (tránh bị game ép khóa lại liên tục)
-rs.RenderStepped:Connect(function()
-    if mouseUnlocked then
-        u.MouseBehavior = Enum.MouseBehavior.Default
+local function forceApplyStats()
+    local char = p.Character
+    local hum = char and char:FindFirstChildOfClass("Humanoid")
+    if hum then
+        hum.WalkSpeed = walkSpeedValue
+        hum.UseJumpPower = true
+        hum.JumpPower = jumpPowerValue
+        hum.JumpHeight = jumpPowerValue 
     end
-end)
+end
 
 btnSpeed.MouseButton1Click:Connect(function()
     local num = tonumber(boxSpeed.Text)
     if num then walkSpeedValue = num else walkSpeedValue = 16 end
+    forceApplyStats()
 end)
 
 btnJump.MouseButton1Click:Connect(function()
     local num = tonumber(boxJump.Text)
     if num then jumpPowerValue = num else jumpPowerValue = 50 end
+    forceApplyStats()
 end)
 
 btnInfJump.MouseButton1Click:Connect(function()
@@ -490,18 +495,65 @@ u.JumpRequest:Connect(function()
     end
 end)
 
+p.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid", 10)
+    if hum then
+        task.wait(0.3)
+        forceApplyStats()
+        hum.Changed:Connect(function(prop)
+            if prop == "WalkSpeed" and hum.WalkSpeed ~= walkSpeedValue then
+                hum.WalkSpeed = walkSpeedValue
+            elseif (prop == "JumpPower" or prop == "JumpHeight") and hum.JumpPower ~= jumpPowerValue then
+                hum.UseJumpPower = true
+                hum.JumpPower = jumpPowerValue
+                hum.JumpHeight = jumpPowerValue
+            end
+        end)
+    end
+end)
+
+u.InputBegan:Connect(function(i, pcd)
+    if not pcd then
+        if i.KeyCode == Enum.KeyCode.LeftControl then
+            if mainFrame.Visible or quickOpenBtn.Visible then
+                if mainFrame.Visible then
+                    mainFrame.Visible = false
+                    quickOpenBtn.Visible = true
+                else
+                    mainFrame.Visible = true
+                    quickOpenBtn.Visible = false
+                end
+            end
+        elseif i.KeyCode == Enum.KeyCode.V then
+            mouseUnlocked = not mouseUnlocked
+            if mouseUnlocked then
+                u.MouseBehavior = Enum.MouseBehavior.Default
+            else
+                u.MouseBehavior = Enum.MouseBehavior.LockCenter
+            end
+        end
+    end
+end)
+
 rs.RenderStepped:Connect(function()
-    local char = p.Character
-    local hum = char and char:FindFirstChildOfClass("Humanoid")
-    if hum and hum.Health > 0 then
-        hum.WalkSpeed = walkSpeedValue
-        hum.JumpPower = jumpPowerValue
+    if mouseUnlocked then
+        u.MouseBehavior = Enum.MouseBehavior.Default
     end
     
-    local rainbowColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    forceApplyStats()
+    
+    local rainbowColor = Color3.fromHSV(tick() % 4 / 4, 1, 1)
     mainStroke.Color = rainbowColor
-    btnStroke.Color = rainbowColor -- Viền nút tròn Tanz cũng đổi màu Rainbow luôn cho đồng bộ
+    btnStroke.Color = rainbowColor
     if loadingFrame and loadStroke then
         loadStroke.Color = rainbowColor
+    end
+    
+    if espEnabled then
+        for _, pl in ipairs(game.Players:GetPlayers()) do
+            if pl ~= p and pl.Character and pl.Character:FindFirstChild("Head") and not pl.Character.Head:FindFirstChild("TanzEspTag") then
+                applyEsp(pl)
+            end
+        end
     end
 end)
