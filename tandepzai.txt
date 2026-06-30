@@ -2,30 +2,68 @@ local p = game.Players.LocalPlayer
 local u = game:GetService("UserInputService")
 local rs = game:GetService("RunService")
 
--- 1. KHỞI TẠO SCREEN GUI
+-- 1. KHỞI TẠO SCREEN GUI TỔNG
 local sg = Instance.new("ScreenGui", p:WaitForChild("PlayerGui"))
-sg.Name = "TanzDepZAI_CustomLayout_V18"
+sg.Name = "TanzDepZAI_Final_Version"
 sg.ResetOnSpawn = false
 
--- Khung nền chính
+----------------------------------------------------------------
+-- [PHẦN 1] MÀN HÌNH LOADING SCREEN BAN ĐẦU
+----------------------------------------------------------------
+local loadingFrame = Instance.new("Frame", sg)
+loadingFrame.Size = UDim2.new(0, 350, 0, 120)
+loadingFrame.Position = UDim2.new(0.5, -175, 0.4, -60)
+loadingFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+loadingFrame.Active = true
+loadingFrame.Draggable = true
+
+local loadStroke = Instance.new("UIStroke", loadingFrame)
+loadStroke.Thickness = 3
+
+local loadTitle = Instance.new("TextLabel", loadingFrame)
+loadTitle.Size = UDim2.new(1, 0, 0, 40)
+loadTitle.BackgroundTransparency = 1
+loadTitle.Text = "TanzDepZAI Hub đang kết nối hệ thống..."
+loadTitle.Font = Enum.Font.SourceSansBold
+loadTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+loadTitle.TextSize = 18
+
+local percentLabel = Instance.new("TextLabel", loadingFrame)
+percentLabel.Size = UDim2.new(1, 0, 0, 40)
+percentLabel.Position = UDim2.new(0, 0, 0, 45)
+percentLabel.BackgroundTransparency = 1
+percentLabel.Text = "0%"
+percentLabel.Font = Enum.Font.SourceSansBold
+percentLabel.TextColor3 = Color3.fromRGB(0, 255, 255)
+percentLabel.TextSize = 24
+
+local barBg = Instance.new("Frame", loadingFrame)
+barBg.Size = UDim2.new(0, 300, 0, 10)
+barBg.Position = UDim2.new(0, 25, 0, 90)
+barBg.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+
+local barFill = Instance.new("Frame", barBg)
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+
+----------------------------------------------------------------
+-- [PHẦN 2] KHUNG NỀN CHÍNH (MENU TANZDEPZAI)
+----------------------------------------------------------------
 local mainFrame = Instance.new("Frame", sg)
 mainFrame.Size = UDim2.new(0, 700, 0, 360)
 mainFrame.Position = UDim2.new(0.3, 0, 0.25, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(236, 233, 216)
 mainFrame.Active = true
+mainFrame.Visible = false 
 
--- VIỀN RAINBOW CHẠY LIÊN TỤC
 local mainStroke = Instance.new("UIStroke", mainFrame)
 mainStroke.Thickness = 4
 
-----------------------------------------------------------------
--- 2. THANH TIÊU ĐỀ (TOP BAR) - ĐÃ THÊM TÊN THƯƠNG HIỆU THEO Ý MÀY
-----------------------------------------------------------------
+-- THANH TIÊU ĐỀ
 local topBarLeft = Instance.new("Frame", mainFrame)
 topBarLeft.Size = UDim2.new(0, 500, 0, 35)
 topBarLeft.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 
--- Thêm Text hiển thị tên thương hiệu "TanzDepZAI làm từ Gemini :)"
 local titleTxt = Instance.new("TextLabel", topBarLeft)
 titleTxt.Size = UDim2.new(1, -20, 1, 0)
 titleTxt.Position = UDim2.new(0, 15, 0, 0)
@@ -41,7 +79,7 @@ topBarRight.Size = UDim2.new(0, 200, 0, 35)
 topBarRight.Position = UDim2.new(0, 500, 0, 0)
 topBarRight.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
 
--- Nút X đóng giao diện
+-- Nút tắt hoàn toàn Menu [X]
 local btnClose = Instance.new("TextButton", topBarRight)
 btnClose.Size = UDim2.new(0, 50, 1, 0)
 btnClose.Position = UDim2.new(1, -50, 0, 0)
@@ -53,8 +91,51 @@ btnClose.TextSize = 16
 local closeStroke = Instance.new("UIStroke", btnClose)
 closeStroke.Color = Color3.fromRGB(0, 0, 0)
 
+-- [MỚI] Nút thu nhỏ [-] kế bên nút X (Theo hình ok.png)
+local btnMinimize = Instance.new("TextButton", topBarRight)
+btnMinimize.Size = UDim2.new(0, 50, 1, 0)
+btnMinimize.Position = UDim2.new(1, -102, 0, 0) -- Xếp bên trái nút X
+btnMinimize.BackgroundColor3 = Color3.fromRGB(150, 150, 150)
+btnMinimize.Text = "-"
+btnMinimize.Font = Enum.Font.SourceSansBold
+btnMinimize.TextColor3 = Color3.fromRGB(255, 255, 255)
+btnMinimize.TextSize = 20
+local miniStroke = Instance.new("UIStroke", btnMinimize)
+miniStroke.Color = Color3.fromRGB(0, 0, 0)
+
 ----------------------------------------------------------------
--- 3. CỘT BÊN TRÁI (MÀU XANH DƯƠNG CHỨA CÁC CHỨC NĂNG & ESP)
+-- [MỚI] TẠO NÚT TRÒN THU NHỎ Ở GÓC PHẢI (GẦN NÚT JUMP - THEO OK.PNG)
+----------------------------------------------------------------
+local quickOpenBtn = Instance.new("TextButton", sg)
+quickOpenBtn.Size = UDim2.new(0, 55, 0, 55)
+quickOpenBtn.Position = UDim2.new(0.85, 0, 0.70, 0) -- Đặt gần nút Jump di động, không bị sát quá
+quickOpenBtn.BackgroundColor3 = Color3.fromRGB(0, 162, 232)
+quickOpenBtn.Text = "Tanz"
+quickOpenBtn.Font = Enum.Font.SourceSansBold
+quickOpenBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+quickOpenBtn.TextSize = 16
+quickOpenBtn.Visible = false -- Ban đầu ẩn đi
+
+local btnCorner = Instance.new("UICorner", quickOpenBtn)
+btnCorner.CornerRadius = UDim.new(1, 0) -- Biến thành hình tròn xịn sò giống ok.png
+
+local btnStroke = Instance.new("UIStroke", quickOpenBtn)
+btnStroke.Thickness = 3
+btnStroke.Color = Color3.fromRGB(255, 255, 255)
+
+-- Logic ẩn/hiển thị khi bấm nút Thu Nhỏ
+btnMinimize.MouseButton1Click:Connect(function()
+    mainFrame.Visible = false
+    quickOpenBtn.Visible = true
+end)
+
+quickOpenBtn.MouseButton1Click:Connect(function()
+    mainFrame.Visible = true
+    quickOpenBtn.Visible = false
+end)
+
+----------------------------------------------------------------
+-- [PHẦN 3] CỘT TRÁI (SPEED / JUMP / INF JUMP / ESP)
 ----------------------------------------------------------------
 local leftPanel = Instance.new("Frame", mainFrame)
 leftPanel.Size = UDim2.new(0, 240, 0, 325)
@@ -105,7 +186,6 @@ end
 local boxSpeed, btnSpeed = createFeatureRow("SPEED", 20)
 local boxJump, btnJump = createFeatureRow("JUMP", 80)
 
--- HÀNG INFINITY JUMP
 local lblInf = Instance.new("TextLabel", leftPanel)
 lblInf.Size = UDim2.new(0, 110, 0, 40)
 lblInf.Position = UDim2.new(0, 10, 0, 140)
@@ -126,9 +206,7 @@ btnInfJump.TextSize = 14
 Instance.new("UICorner", btnInfJump).CornerRadius = UDim.new(0, 12)
 local infStroke = Instance.new("UIStroke", btnInfJump)
 infStroke.Color = Color3.fromRGB(0, 0, 0)
-infStroke.Thickness = 3
 
--- HÀNG ESP NAME
 local lblEsp = Instance.new("TextLabel", leftPanel)
 lblEsp.Size = UDim2.new(0, 110, 0, 40)
 lblEsp.Position = UDim2.new(0, 10, 0, 200)
@@ -149,10 +227,9 @@ btnEsp.TextSize = 14
 Instance.new("UICorner", btnEsp).CornerRadius = UDim.new(0, 12)
 local espStroke = Instance.new("UIStroke", btnEsp)
 espStroke.Color = Color3.fromRGB(0, 0, 0)
-espStroke.Thickness = 3
 
 ----------------------------------------------------------------
--- 4. KHU VỰC BÊN PHẢI (6 HÀNG SCRIPT MÀU VÀNG & NÚT XANH LÁ)
+-- [PHẦN 4] KHU VỰC BÊN PHẢI (6 HÀNG SCRIPT)
 ----------------------------------------------------------------
 local rightPanel = Instance.new("Frame", mainFrame)
 rightPanel.Size = UDim2.new(0, 460, 0, 325)
@@ -195,7 +272,7 @@ createScriptRow("script hitbox", 208, "https://pastefy.app/ItfO0tdg/raw")
 createScriptRow("infinite yield", 260, "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source")
 
 ----------------------------------------------------------------
--- 5. CƠ CHẾ KÉO CẠNH CO GIÃN ĐỘC LẬP CHUẨN WINDOWS
+-- [PHẦN 5] CƠ CHẾ RE-SIZE MENU
 ----------------------------------------------------------------
 local resizeRight = Instance.new("TextButton", mainFrame)
 resizeRight.Size = UDim2.new(0, 15, 1, 0)
@@ -260,7 +337,20 @@ u.InputEnded:Connect(function(input)
 end)
 
 ----------------------------------------------------------------
--- 6. HỆ THỐNG ESP NAME
+-- [PHẦN 6] CHẠY ĐẾM % LOADING
+----------------------------------------------------------------
+task.spawn(function()
+    for i = 0, 100 do
+        percentLabel.Text = tostring(i) .. "%"
+        barFill.Size = UDim2.new(i / 100, 0, 1, 0)
+        task.wait(0.02)
+    end
+    loadingFrame:Destroy()
+    mainFrame.Visible = true
+end)
+
+----------------------------------------------------------------
+-- [PHẦN 7] HỆ THỐNG ESP NAME
 ----------------------------------------------------------------
 local function applyEsp(v)
     if v ~= p then
@@ -328,16 +418,44 @@ rs.RenderStepped:Connect(function()
 end)
 
 ----------------------------------------------------------------
--- 7. VÒNG LẶP HACK CHỈ SỐ VẬT LÝ & VIỀN RAINBOW
+-- [PHẦN 8] VÒNG LẶP CHỈ SỐ VẬT LÝ & RAINBOW BORDER
 ----------------------------------------------------------------
 btnClose.MouseButton1Click:Connect(function() 
     removeEsp()
     sg:Destroy() 
 end)
 
+-- [MỚI CẬP NHẬT] Thêm phím [V] để mở khóa chuột khi nhìn góc nhìn thứ nhất (Theo hình ok.png)
+local mouseUnlocked = false
 u.InputBegan:Connect(function(i, pcd)
-    if not pcd and i.KeyCode == Enum.KeyCode.LeftControl then
-        mainFrame.Visible = not mainFrame.Visible
+    if not pcd then
+        -- Nhấn nút Control Trái để ẩn/hiện bảng nhanh
+        if i.KeyCode == Enum.KeyCode.LeftControl then
+            if mainFrame.Visible or quickOpenBtn.Visible then
+                if mainFrame.Visible then
+                    mainFrame.Visible = false
+                    quickOpenBtn.Visible = true
+                else
+                    mainFrame.Visible = true
+                    quickOpenBtn.Visible = false
+                end
+            end
+        -- Nhấn nút [V] để khóa/mở khóa di chuyển chuột tự do ở góc nhìn thứ nhất
+        elseif i.KeyCode == Enum.KeyCode.V then
+            mouseUnlocked = not mouseUnlocked
+            if mouseUnlocked then
+                u.MouseBehavior = Enum.MouseBehavior.Default -- Mở khóa chuột tự do
+            else
+                u.MouseBehavior = Enum.MouseBehavior.LockCenter -- Khóa tâm lại theo game
+            end
+        end
+    end
+end)
+
+-- Giữ chuột luôn mở khóa nếu chế độ mouseUnlocked được bật (tránh bị game ép khóa lại liên tục)
+rs.RenderStepped:Connect(function()
+    if mouseUnlocked then
+        u.MouseBehavior = Enum.MouseBehavior.Default
     end
 end)
 
@@ -379,5 +497,11 @@ rs.RenderStepped:Connect(function()
         hum.WalkSpeed = walkSpeedValue
         hum.JumpPower = jumpPowerValue
     end
-    mainStroke.Color = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    
+    local rainbowColor = Color3.fromHSV(tick() % 5 / 5, 1, 1)
+    mainStroke.Color = rainbowColor
+    btnStroke.Color = rainbowColor -- Viền nút tròn Tanz cũng đổi màu Rainbow luôn cho đồng bộ
+    if loadingFrame and loadStroke then
+        loadStroke.Color = rainbowColor
+    end
 end)
